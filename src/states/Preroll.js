@@ -152,18 +152,18 @@ class Preroll extends AdState {
    */
   startLinearAdMode() {
     const player = this.player;
-
     if (this.adsReady && !player.ads.inAdBreak() && !this.isContentResuming()) {
-      this.clearTimeout(player);
-      player.ads.adType = 'preroll';
-      this.waitingForAdBreak = false;
-      adBreak.start(player);
-
-      // We don't need to block play calls anymore
-      player.ads._shouldBlockPlay = false;
+      player.ads.endLinearAdMode();
     } else {
-      videojs.log.warn('Unexpected startLinearAdMode invocation (Preroll)');
+      videojs.log.warn('WB: (es.js) Unexpected startLinearAdMode invocation (Preroll)');
     }
+    this.clearTimeout(player);
+    player.ads.adType = 'preroll';
+    this.waitingForAdBreak = false;
+    adBreak.start(player);
+
+    // We don't need to block play calls anymore
+    player.ads._shouldBlockPlay = false;
   }
 
   /*
@@ -224,6 +224,13 @@ class Preroll extends AdState {
     } else {
       this.noPreroll();
     }
+  }
+
+  /**
+  * If content changes while in Preroll state, transition to BeforePreroll
+  */
+  onContentChanged() {
+    this.transitionTo(BeforePreroll);
   }
 
   resumeAfterNoPreroll(player) {
